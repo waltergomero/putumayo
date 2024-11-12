@@ -7,6 +7,7 @@ import localFont from "next/font/local";
 //import "./globals.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
+import NavBar from "@/components/ui/navbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,6 +35,7 @@ export default function RootLayout({  children,}) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
+          <NavBar/>
           {loading ? <Loader /> : children}
         </div>
       </body>
