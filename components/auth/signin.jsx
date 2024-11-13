@@ -6,10 +6,11 @@ export default function SignIn() {
 
     if(!session){     
         return (
-                <button onClick={() => signIn()}>Sign In</button>)
+        
+                <button onClick={() => signIn()} className="block text-white rounded-md bg-blue-500 pt-1 pb-1 pl-2 pr-2">Sign In</button>)
                 }
     
         return (
-                <button onClick={() => signOut()}>Sign Out</button>)
+                <button onClick={() => signOut()} className="block text-white rounded-md bg-red-600 pt-1 pb-1 pl-2 pr-2">Sign Out</button>)
 
 }

@@ -8,6 +8,7 @@ import localFont from "next/font/local";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import NavBar from "@/components/ui/navbar";
+import { SessionProvider } from "next-auth/react"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,8 +36,10 @@ export default function RootLayout({  children,}) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning={true}>
         <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          <NavBar/>
-          {loading ? <Loader /> : children}
+        <SessionProvider>
+          <NavBar/>         
+            {loading ? <Loader /> : children}
+          </SessionProvider>
         </div>
       </body>
     </html>
