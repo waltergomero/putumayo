@@ -33,16 +33,17 @@ export const fetchFilteredUsers = async (q, page) => {
 export async function fetchUserPages(query) {
   noStore();
   const regex = new RegExp(query, "i");
-
+  console.log("query in user action", query);
   try {
     await connectDB();
     const count = await User.find({ email: { $regex: regex } }).count();
-
+    console.log("count", count);
     const totalpages = Math.ceil(Number(count) / ITEM_PER_PAGE);
-
+    console.log("totalPages", totalPages);
     return totalpages;
 
   } catch (err) {
+    console.log("err", err);
     return({error: "Failed to fetch users!"});
   }
 }
@@ -60,7 +61,8 @@ export const fetchUserById = async (id) => {
   }
 };
 
-export async function createUser(formData) {
+export async function createUser(formData, register=null) {
+  console.log("formData", formData);
   try {
     const _isAdmin = formData.get("isadmin");
     const first_name = formData.get("first_name");
@@ -101,8 +103,14 @@ export async function createUser(formData) {
     return { error: "Failed to insert new user!" };
   }
 
-  revalidatePath("/auth/login");
-  redirect("/auth/login");
+  if(register){
+    revalidatePath("/auth/login");
+    redirect("/auth/login");
+  }
+else{
+  revalidatePath("/admin/users");
+  redirect("/admin/users");
+}
 }
 
 export async function updateUser(formData) {
@@ -111,6 +119,7 @@ export async function updateUser(formData) {
     const id = formData.get("id");
     const first_name = formData.get("first_name");
     const last_name = formData.get("last_name");
+    const name = formData.get("first_name") + ' ' + formData.get("last_name");
     const email = formData.get("email");
     const password = formData.get("password");
     const isadmin = formData.get("isadmin");
@@ -134,6 +143,7 @@ export async function updateUser(formData) {
        query = {
           first_name: first_name,
           last_name: last_name,
+          name: name,
           email: email,
           password: hashedPassword,
           isadmin: isadmin,
@@ -145,6 +155,7 @@ export async function updateUser(formData) {
        query = {
         first_name: first_name,
         last_name: last_name,
+        name: name,
         email: email,
         isadmin: isadmin,
         isactive: isactive,
@@ -156,8 +167,8 @@ export async function updateUser(formData) {
     return { error: err };
   }
 
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
+  revalidatePath("/admin/users");
+  redirect("/admin/users");
 }
 
 export async function deleteUser(id) {

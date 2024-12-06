@@ -19,7 +19,7 @@ const RegisterForm = () => {
     event.preventDefault();
     try {
         const formData = new FormData(event.currentTarget);
-        const response = await createUser(formData);
+        const response = await createUser(formData, 'register');
 
         if (!!response.error) {
             console.log("error 1: ", response.error);

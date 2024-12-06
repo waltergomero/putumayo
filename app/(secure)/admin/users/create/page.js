@@ -6,10 +6,10 @@ export default async function UserCreatePage() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Users", href: "/dashboard/users" },
+          { label: "Users", href: "/admin/users" },
           {
             label: "Create User",
-            href: "/dashboard/users/create",
+            href: "/admin/users/create",
             active: true,
           },
         ]}

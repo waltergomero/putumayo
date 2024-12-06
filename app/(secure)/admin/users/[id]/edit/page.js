@@ -4,9 +4,10 @@ import {fetchUserById} from '@/actions/user-actions'
 import notFound from "./not-found";
 
 export default async function UserEditPage({params}) {
-  const id = params.id;
 
+  const {id} = await params;
   const [user] = await Promise.all([fetchUserById(id)]);
+  console.log("user edit page", user);
 
   if (!user) {
     notFound();
@@ -16,10 +17,10 @@ export default async function UserEditPage({params}) {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "Users", href: "/dashboard/users" },
+          { label: "Users", href: "/admin/users" },
           {
             label: "Update User Information",
-            href: `/dashboard/users/${id}/edit`,
+            href: `/admin/users/${id}/edit`,
             active: true,
           },
         ]}

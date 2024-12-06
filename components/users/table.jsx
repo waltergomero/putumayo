@@ -1,4 +1,4 @@
-import { UpdateUser, DeleteUser } from '@/components/users/buttons';
+import { UpdateUserBtn, DeleteUserBtn } from '@/components/users/buttons';
 import { fetchFilteredUsers } from '@/actions/user-actions';
 import { Fragment } from 'react';
 import Image from 'next/image';
@@ -44,8 +44,8 @@ export default async function UsersTable({ query, currentPage }) {
                     </div>
                     <div className="flex w-full items-center justify-between pt-4">
                       <div className="flex justify-end gap-2">
-                        <UpdateUser id={user._id.toString()} />
-                        <DeleteUser id={user._id.toString()} />
+                        <UpdateUserBtn id={user._id.toString()} />
+                        <DeleteUserBtn id={user._id.toString()} />
                       </div>
                     </div>
                   </div>
@@ -105,8 +105,8 @@ export default async function UsersTable({ query, currentPage }) {
                 </td>
                 <td className="border-b border-[#eee] px-4 py-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
-                    <UpdateUser id={user._id.toString()}/>
-                    <DeleteUser id={user._id.toString()}/>
+                    <UpdateUserBtn id={user._id.toString()}/>
+                    <DeleteUserBtn id={user._id.toString()}/>
                   </div>
                 </td>
               </tr>

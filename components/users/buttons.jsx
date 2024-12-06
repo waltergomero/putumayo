@@ -8,7 +8,7 @@ import {
   import { deleteUser } from "@/actions/user-actions";
   import { Button } from "@/components/ui/button";
   
-  export function CreateUser() {
+  export function CreateUserBtn() {
     return (
       <Link
         href="/admin/users/create"
@@ -20,7 +20,7 @@ import {
     );
   }
   
-  export function UpdateUser({ id }) {
+  export function UpdateUserBtn({ id }) {
     return (
       <Link
         href={`/admin/users/${id}/edit`}
@@ -30,7 +30,7 @@ import {
     );
   }
   
-  export function DeleteUser({ id }) {
+  export function DeleteUserBtn({ id }) {
     const deleteUserWithId = deleteUser.bind(null, id);
     return (
       <form action={deleteUserWithId}>
@@ -41,13 +41,13 @@ import {
     );
   }
   
-  export function CancelUser() {
+  export function CancelUserBtn() {
     return (
       <Link
         href="/admin/users"
         className="flex h-10 items-center rounded-lg bg-gray-400 px-4 text-sm font-medium text-white transition-colors hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
       >
-        <span className="hidden md:block">Cancel</span>{" "}
+        <span className="hidden md:block">Cancel</span>
         <XCircleIcon className="h-6 md:ml-4" />
       </Link>
     );
