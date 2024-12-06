@@ -23,8 +23,6 @@ export const fetchFilteredUsers = async (q, page) => {
       .limit(ITEM_PER_PAGE)
       .skip(ITEM_PER_PAGE * (page - 1));
 
-   // await db.disconnect();
-
     return users
 
   } catch (err) {

@@ -189,8 +189,8 @@ const menuGroups = [
             </defs>
           </svg>
         ),
-        label: "Settings",
-        route: "/settings",
+        label: "Users",
+        route: "/admin/users",
       },
     ],
   },
