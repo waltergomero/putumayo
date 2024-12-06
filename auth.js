@@ -1,59 +1,71 @@
 import NextAuth from "next-auth";
-import authConfig from "./auth.config";
+import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
 import connectDB from "@/config/database";
 import User from "@/models/User";
+import bcryptjs from "bcryptjs";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-...authConfig,
-session: { strategy: "jwt"},
-callbacks: {
-  async signIn({profile, account}) {
-    console.log("profile account: ", profile, account)
-    await connectDB();
-    const user = await User.findOne({email: profile.email});
+export const {
+    handlers: { GET, POST },
+    auth, signIn, signOut,} = NextAuth({
 
-    console.log("user info: ", user);
-    if(!user){
-      await User.create({
-        firs_name: profile.login || profile.name,
-        last_name: profile.login || profile.name,
-        username: profile.login || profile.name,
-        Image: profile.picture,
-        provider: profile.url,
-        email: profile.email,
-        password: "password",
-        provider: account.provider,
-        type: account.type,
-        isadmin: false,
-        isactive: true,
-      });
-    }
+    session: {strategy: 'jwt',},
+    providers: [
+        CredentialsProvider({
+            credentials: {
+                email: {},
+                password: {},
+            },
+            async authorize(credentials) {
+                if (credentials === null) return null;
+                console.log("credentials: ", credentials)
+                const { email, password } = credentials;
+                
+                try {              
+                    await connectDB();
+                   const user = await User.findOne({email: email});
 
-    const providerMatch = user.provider === account.provider;
-    console.log("providerMatch: ", providerMatch);
+                    if (user) {
+                        const isMatch =  await bcryptjs.compare(password, user.password); //user?.password === credentials.password;
 
-    if (user && providerMatch) {
-      return true;
-    }
-    else{
-       throw new Error(`Please use ${account.provider} provider to sign in`);
-      }
-    },
+                        if (isMatch) {
+                            return user;
+                        } else {
+                            throw new Error("Email or Password is not correct");
+                        }
+                    } else {
+                        throw new Error("User not found");
+                    }
+                } catch (error) {
+                    throw new Error(error);
+                }
+            },
+        }),
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            authorization: {
+                params: {
+                    prompt: "consent",
+                    access_type: "offline",
+                    response_type: "code",
+                },
+            },
+            
+        }),
+        GitHub({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            authorization: {
+                params: {
+                    prompt: "consent",
+                    access_type: "offline",
+                    response_type: "code",
+                },
+            },
+        }),
+    ],
 
-    jwt({ token, user, account}) {
-      if (user) {
-        token.role = user.role;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/auth/login",
-  },
-})
+   
+});

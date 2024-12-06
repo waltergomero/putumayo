@@ -71,8 +71,8 @@ export async function createUser(formData) {
     const email = formData.get("email");
     const password = formData.get("password");
     const isadmin = _isAdmin ? true : false;
-    const provider = "credenctials";
-    const type = "credenctials";
+    const provider = "credentials";
+    const type = "credentials";
 
 
     await connectDB();
@@ -176,11 +176,8 @@ export async function deleteUser(id) {
 export async function fetchUserByEmail(email) {
   try {
     await connectDB();
-    console.log("passed email: ", email)
-    const user = await User.findOne({email: email});
-
-    console.log("returned user: ", user)
-    return user;
+    return await User.findOne({email: email});
+    //return user;
   } catch (error) {
 
     throw new Error('Failed to fetch user.');
@@ -205,18 +202,19 @@ export async function doCredentialLogin(formData) {
  
 }
 
-export async function doProviderLogin(profile) {
-  console.log("action provider: ", profile);
+export async function doSocialLogin(provider) {
 
-  try {
-    await signIn(profile)
-    return { success: true };
-  } 
-  catch (error) {
-    if (error instanceof AuthError) {
-      return { error: error.cause?.err?.message };
-    }
-    return { error: `error 500 ${profile}` };
-  }
- 
+ await signIn(provider, { redirectTo: "/admin" });
+
+  // try {
+  //   await signIn(provider);
+    
+  // } 
+  // catch (error) {
+  //   if (error instanceof AuthError) {
+  //     return { error: error.cause?.err?.message };
+  //   }
+  //   return { error: `error 500 ${error}` };
+  // }
+  // redirect("/admin");
 }

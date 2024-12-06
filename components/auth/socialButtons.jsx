@@ -4,36 +4,41 @@ import React from 'react';
 import {FcGoogle} from "react-icons/fc";
 import {FaGithub} from "react-icons/fa";
 import { toast } from 'react-toastify';
-import { doProviderLogin } from '@/actions/user-actions';
+import { doSocialLogin } from '@/actions/user-actions';
 
 const SocialButtons = () => {
 
   const handleClick = async (event, provider) => {
 
-    console.log(`Button ${provider} was clicked`);
     event.preventDefault();
     try {
-        const response = await doProviderLogin(provider);
+        const response = await doSocialLogin(provider);
         if (response.error) {
             toast.error(response.error);
         } else {
             router.push("/admin");
         }
-    } catch (e) {
+    } catch (error) {
+      console.log("error: ", error)
       toast.error("Check your Credentials");
     }
   };
 
   return (
-    
+    <form onSubmit={handleClick} >
     <div className='flex items-center w-full p-2 gap-x-2 pb-4'>
-      <button type='submit' className='flex w-full justify-center rounded p-3 font-medium text-black border' onClick={(event) => handleClick(event, 'google')}>
+      <button type='submit' 
+      className='flex w-full justify-center rounded p-3 font-medium text-black border' 
+      onClick={(event) => handleClick(event, 'google')}>
         <FcGoogle className='w-6 h-6 mr-2'/>Sign in with Google
       </button>
-      <button  type='submit' className='flex w-full justify-center rounded  p-3 font-medium text-black border' onClick={(event) => handleClick(event, 'github')}>
+      <button  type='submit' 
+      className='flex w-full justify-center rounded  p-3 font-medium text-black border' 
+       onClick={(event) => handleClick(event, 'github')}>
         <FaGithub className='w-6 h-6 mr-2'/>Sign in with  Github
       </button>
     </div>
+    </form>
   )
 }
 
