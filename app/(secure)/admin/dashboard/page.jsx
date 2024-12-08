@@ -11,9 +11,7 @@ export const metadata = {
 export default function DashboardPage() {
   return (
     <>
-      <DefaultLayout>
         <ECommerce />
-      </DefaultLayout>
     </>
   );
 }

@@ -33,17 +33,15 @@ export const fetchFilteredUsers = async (q, page) => {
 export async function fetchUserPages(query) {
   noStore();
   const regex = new RegExp(query, "i");
-  console.log("query in user action", query);
   try {
     await connectDB();
-    const count = await User.find({ email: { $regex: regex } }).count();
-    console.log("count", count);
-    const totalpages = Math.ceil(Number(count) / ITEM_PER_PAGE);
-    console.log("totalPages", totalPages);
-    return totalpages;
+    const matchingElements  = await User.find({ email: { $regex: regex } }) //.count();
+    const count = matchingElements.length
+
+    const totalPages = Math.ceil(Number(count) / ITEM_PER_PAGE);
+    return totalPages;
 
   } catch (err) {
-    console.log("err", err);
     return({error: "Failed to fetch users!"});
   }
 }

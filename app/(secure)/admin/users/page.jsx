@@ -4,17 +4,17 @@ import { CreateUserBtn } from '@/components/users/buttons';
 import Pagination from '@/components/ui/pagination';
 import { fetchUserPages } from '@/actions/user-actions';
 import { Suspense } from 'react';
-
+import DefaultLayout from '@/components/layout/defaultLayout';
 
 export const metadata = {  title: 'Users',};
 
 export default async function UserPage({ searchParams,}) {
- //console.log("searchParams", searchParams);
-  const {query} = await searchParams?.query || '';
+  const params = await searchParams;
+  const query = params.query || '';
+  const page = params.page || 1;
 
-  const currentPage = Number(searchParams?.page) || 1;
+  const currentPage = Number(page);
   const totalPages = await fetchUserPages(query);
-  console.log("totalPages", totalPages);
 
   return (
     <div className="w-full">
@@ -25,9 +25,12 @@ export default async function UserPage({ searchParams,}) {
       <Suspense key={query + currentPage} >
         <Table query={query} currentPage={currentPage} />
       </Suspense>
-      {/* <div className="mt-5 flex w-full justify-center">
+
+      { page === 1 ? "" : 
+      <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} /> 
-      </div> */}
+      </div>
+      }
     </div>
   );
 }
