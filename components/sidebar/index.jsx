@@ -56,6 +56,13 @@ const menuGroups = [
         icon: (
           <MdCategory className="w-5 h-5"/>
         ),
+        label: "Products",
+        route: "/admin/products",
+      },
+      {
+        icon: (
+          <MdCategory className="w-5 h-5"/>
+        ),
         label: "Categories",
         route: "/admin/categories",
       },
