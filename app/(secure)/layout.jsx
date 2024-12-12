@@ -43,7 +43,7 @@ export default function RootLayout({children,}) {
               <ToastContainer 
                   theme="colored"
                   position="top-center"
-                  autoClose={6000}
+                  autoClose={4000}
                   hideProgressBar={false}
                   newestOnTop={false}
                   closeOnClick

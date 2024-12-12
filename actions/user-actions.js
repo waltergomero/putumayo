@@ -2,12 +2,13 @@
 
 import  User  from "@/models/User";
 import bcryptjs from "bcryptjs";
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import connectDB from "@/config/database";
+import { userRegistrationSchema, userSigninSchema } from "@/schemas/validationSchemas";
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 const ITEM_PER_PAGE = 10;
 
@@ -59,7 +60,8 @@ export const fetchUserById = async (id) => {
   }
 };
 
-export async function createUser(formData, register=null) {
+export async function createUser( formData, register=false) {
+  const redirectPath = register ? "/auth/login" : "/admin/users";
   console.log("formData", formData);
   try {
     const _isAdmin = formData.get("isadmin");
@@ -72,15 +74,34 @@ export async function createUser(formData, register=null) {
     const provider = "credentials";
     const type = "credentials";
 
+    const validatedFields = userRegistrationSchema.safeParse({
+      first_name,
+      last_name,
+      email,
+      password
+    });
 
+    console.log("validatedFields", validatedFields);
+
+    if (!validatedFields.success) {
+      return {
+        error: "validation",
+        zodErrors: validatedFields.error.flatten().fieldErrors,
+        strapiErrors: null,
+        message: "Missing information on key fields.",
+      };
+    }
+  
+    else{
     await connectDB();
     const userexists = await User.findOne({ email: email });
 
     if (userexists) {
-      //throw new Error("User with this email account already exists.");
-      return { error: `User with this email account ${email} already exists.` };
+      return { 
+        error: "userexists",
+        message: `User with this email account ${email} already exists.`, 
     }
-
+  }
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
@@ -96,19 +117,14 @@ export async function createUser(formData, register=null) {
     });
 
     await newUser.save();
+  }
 
   } catch (err) {
-    return { error: "Failed to insert new user!" };
+    return { error: "Failed to insert new user!" + err};
   }
 
-  if(register){
-    revalidatePath("/auth/login");
-    redirect("/auth/login");
-  }
-else{
-  revalidatePath("/admin/users");
-  redirect("/admin/users");
-}
+  revalidatePath(redirectPath);
+  redirect(redirectPath);
 }
 
 export async function updateUser(formData) {
@@ -193,11 +209,22 @@ export async function fetchUserByEmail(email) {
 
 export async function doCredentialLogin(formData) {
   try {
-    await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirect: false,
-    });
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    const validatedFields = userSigninSchema.safeParse({email, password});
+
+    console.log("validatedFields", validatedFields);
+
+    if (!validatedFields.success) {
+      return {
+        error: "Missing information on key fields.",
+        zodErrors: validatedFields.error.flatten().fieldErrors,
+        strapiErrors: null,
+      };
+    }
+
+    await signIn("credentials", {email, password, redirect: false,});
     return { success: true };
   } 
   catch (error) {
@@ -210,7 +237,7 @@ export async function doCredentialLogin(formData) {
 }
 
 export async function doSocialLogin(provider) {
-
+  
  await signIn(provider, { redirectTo: "/admin" });
 
   // try {

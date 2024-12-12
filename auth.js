@@ -19,20 +19,18 @@ export const {
             },
             async authorize(credentials) {
                 if (credentials === null) return null;
-                console.log("credentials: ", credentials)
                 const { email, password } = credentials;
                 
                 try {              
                     await connectDB();
                    const user = await User.findOne({email: email});
-
-                    if (user) {
-                        const isMatch =  await bcryptjs.compare(password, user.password); //user?.password === credentials.password;
+                   if (user) {
+                        const isMatch =  await bcryptjs.compare(password, user.password); 
 
                         if (isMatch) {
                             return user;
                         } else {
-                            throw new Error("Email or Password is not correct");
+                            throw new Error("Password is not correct");
                         }
                     } else {
                         throw new Error("User not found");

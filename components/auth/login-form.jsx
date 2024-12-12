@@ -2,29 +2,30 @@
 import {
   AtSymbolIcon,
   KeyIcon, EyeIcon, EyeSlashIcon,
-  ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { useFormState, useFormStatus } from 'react-dom';
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { doCredentialLogin } from '@/actions/user-actions';
 import { toast } from 'react-toastify';
-
+import { ZodErrors } from "@/components/common/zodErrors";
+import { useRouter } from "next/navigation";
 
 import Link from 'next/link';
 
 const LoginForm = () => {
-
   const router = useRouter();
+  const [state, setState] = useState(null);
   const [visible, setVisible] = useState(false);
   const [password, setPassword] = useState("")
 
+ 
   async function onSubmit(event) {
     event.preventDefault();
     try {
         const formData = new FormData(event.currentTarget);
         const response = await doCredentialLogin(formData);
+        console.log("client response", response);
         if (response.error) {
+            setState(response);
             toast.error(response.error);
         } else {
             router.push("/admin");
@@ -32,7 +33,7 @@ const LoginForm = () => {
     } catch (e) {
       toast.error("Check your Credentials");
     }
-}
+ }
 
   return (
   
@@ -46,11 +47,11 @@ const LoginForm = () => {
                  type="email"
                  name="email"
                  placeholder="Enter your email address"
-                 required
                 className="w-full rounded border-[1.5px] pl-10  border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white"
             />
             <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
+            <ZodErrors error={state?.zodErrors?.email} />
         </div>
         <div>
             <label htmlFor='password' className="block text-sm font-medium text-black dark:text-white">Password:</label>
@@ -61,7 +62,6 @@ const LoginForm = () => {
                 type={visible ? "text" : "password"}
                 name="password"
                 placeholder="Enter password"
-                required
                 minLength={6}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full rounded border-[1.5px] pl-10  border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white"/>
@@ -70,6 +70,7 @@ const LoginForm = () => {
              {!visible ? <EyeSlashIcon /> : <EyeIcon />} 
             </span>
         </div>
+        <ZodErrors error={state?.zodErrors?.password} />
         </div>
         <div className="mb-5.5 mt-5 flex  items-center justify-between">
           <div className='flex items-center'>

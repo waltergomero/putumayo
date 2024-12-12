@@ -4,7 +4,6 @@ import { CreateUserBtn } from '@/components/users/buttons';
 import Pagination from '@/components/ui/pagination';
 import { fetchUserPages } from '@/actions/user-actions';
 import { Suspense } from 'react';
-import DefaultLayout from '@/components/layout/defaultLayout';
 
 export const metadata = {  title: 'Users',};
 
