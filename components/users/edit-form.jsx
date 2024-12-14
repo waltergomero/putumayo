@@ -1,18 +1,34 @@
 "use client";
 
+import {  useState} from "react";
 import { updateUser } from "@/actions/user-actions";
 import { SaveUserBtn, CancelUserBtn } from "@/components/users/buttons";
 import { toast } from 'react-toastify';
-import CheckboxDefault from "@/components/checkboxes/checkbox"
+import CheckboxDefault from "@/components/checkboxes/checkbox";
+import { ZodErrors } from "@/components/common/zodErrors";
 
 export default function UserEditForm({user}) {
+  const [state, setState] = useState(null);
 
-  const _updateUser = async (formData) => {
-    const result = await updateUser(formData);
-    if (result?.error) {
-      toast.error(result.error);
-    } 
-  };
+    async function onSubmit(event) {
+      event.preventDefault();
+      setState(null);
+      
+      const formData = new FormData(event.currentTarget);
+      const response = await updateUser(formData);
+  
+      if (response.error === "validation") {
+              setState(response);
+              toast.error(response.message);
+          } 
+      else if (response.error==="userexists") {
+            toast.error(response.message);
+          } 
+      else {
+            toast.error(response.error);
+          }
+        
+    }
 
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -21,7 +37,7 @@ export default function UserEditForm({user}) {
         Edit User Form
       </h3>
     </div>
-    <form action={_updateUser} >
+    <form onSubmit={onSubmit} >
     <input type="hidden" name="id" defaultValue={user._id.toString()}/>
       <div className="p-6.5">
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -34,8 +50,9 @@ export default function UserEditForm({user}) {
               name="first_name"
               defaultValue={user.first_name}
               placeholder="Enter your first name"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
+            <ZodErrors error={state?.zodErrors?.first_name} />
           </div>
 
           <div className="w-full xl:w-1/2">
@@ -47,25 +64,28 @@ export default function UserEditForm({user}) {
               name="last_name"
               defaultValue={user.last_name}
               placeholder="Enter your last name"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
+            <ZodErrors error={state?.zodErrors?.last_name} />
           </div>
         </div>
 
-        <div className="mb-4.5">
+        <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
+        <div className="w-full xl:w-1/2">
           <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-            Email: <span className="text-meta-1">*</span>
+            Email:<span className="text-meta-1">*</span>
           </label>
           <input
             type="email"
             name="email"
             defaultValue={user.email}
             placeholder="Enter your email address"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
+           <ZodErrors error={state?.zodErrors?.email} />
         </div>
 
-        <div className="mb-4.5">
+        <div className="w-full xl:w-1/2">
           <label className="mb-3 block text-sm font-medium text-black dark:text-white">
             Password:
           </label>
@@ -73,9 +93,13 @@ export default function UserEditForm({user}) {
             type="password"
             name="password"
             placeholder="Enter password"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            defaultValue=""
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
+
         </div>
+        </div>
+
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
           <div className="w-full xl:w-1/2">
           <CheckboxDefault  title="Is user admin?" name="isadmin" checked={user.isadmin} />

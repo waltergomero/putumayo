@@ -6,6 +6,9 @@ import connectDB from "@/config/database";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
+import { productSchema } from "@/schemas/validationSchemas";
+import fs from 'fs';
+import path from 'path';
 
 const ITEM_PER_PAGE = 10;
 
@@ -82,12 +85,24 @@ console.log("produc Info:", formData)
     const reorder_level = formData.get("reorder_level");
     const description = formData.get("description"); 
 
+    const validatedFields = productSchema.safeParse({product_name, slug, category_id,});
+                
+    if (!validatedFields.success) {
+        return {
+                error: "validation",
+                zodErrors: validatedFields.error.flatten().fieldErrors,
+                strapiErrors: null,
+                message: "Missing information on key fields.",
+              };
+            }
 
     await connectDB();
     const productexists = await Product.findOne({ product_name: product_name });
 
     if (productexists) {
-      return { error: `Product name ${product_name} already exists.` };
+      return { 
+        error: "productexists",
+        message: `Product name ${product_name} already exists.` };
     }
 
     const newProduct = new Product({
@@ -130,12 +145,24 @@ export async function updateProduct(formData) {
     const description = formData.get("description"); 
     const isactive = formData.get("isactive");
 
+    const validatedFields = productSchema.safeParse({product_name, slug, category_id,});
+                
+    if (!validatedFields.success) {
+        return {
+                error: "validation",
+                zodErrors: validatedFields.error.flatten().fieldErrors,
+                strapiErrors: null,
+                message: "Missing information on key fields.",
+                };
+            }
+
     await connectDB();
     const productexists = await Product.findOne({ product_name: product_name });
 
     if (productexists) {
       if (productexists._id != id) {
-        return  {error: `Product name "${product_name}"  already exists`};
+        return  {error: "productexists",
+                error: `Product name "${product_name}"  already exists`};
       }
     }
 
@@ -189,12 +216,23 @@ export const fetchImageByProductId = async (productid) => {
 };
 
 export async function deleteImageFromProduct(id, image_path) {
+console.log("Image Info:", id, image_path)
   try {
     await connectDB();
-    await Images.findByIdAndDelete(id);
+    const response = await Images.findByIdAndDelete(id);
     
-  } catch (err) {
-    throw new Error("Failed to delete product!");
-  }
-  revalidatePath("/admin/products");
+    if (response) {
+      // Delete the image
+      const filePath = path.join(process.cwd(), 'public', image_path);
+      fs.unlinkSync(filePath);
+      return  {error: "success",
+                message: "message: 'Image deleted successfully"};
+            } 
+
+  } 
+  catch (error) {
+    return  {error: "success",
+                message: "Failed to delete image! " + error};
+            } 
+
 }

@@ -1,5 +1,5 @@
 import { UpdateUserBtn, DeleteUserBtn } from '@/components/users/buttons';
-import { fetchFilteredUsers } from '@/actions/user-actions-prev';
+import { fetchFilteredUsers } from '@/actions/user-actions';
 import { Fragment } from 'react';
 import Image from 'next/image';
 

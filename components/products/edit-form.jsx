@@ -3,27 +3,41 @@
 import { useState} from "react";
 import { updateProduct } from "@/actions/product-actions";
 import { SaveProductBtn, CancelProductBtn } from "@/components/products/buttons";
-import Link from "next/link";
 import { toast } from 'react-toastify';
 import CheckboxDefault from "../Checkboxes/checkbox";
 import { Tabs, TabList, Tab, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import UploadImage from "./uploadImage";
 import ImageGrid from "./image-grid";
-//import { useSearchParams } from 'next/navigation'
+import { ZodErrors } from "@/components/common/zodErrors";
 
 
-export default function ProductEditForm({product, categories, images}) {
 
-  const [tabIndex, setTabIndex] = useState(0);
+export default function ProductEditForm({product, categories, images, index=0}) {
+
+  const [tabIndex, setTabIndex] = useState(index);
   const [CategoryValue, setCategoryValue] = useState(product.category_name);
-  
-  const _updateProduct = async (formData) => {
-    const result = await updateProduct(formData);
-    if (result?.error) {
-      toast.error(result.error);
-    } 
-  };
+  const [state, setState] = useState(null);
+    
+  async function onSubmit(event) {
+        event.preventDefault();
+        setState(null);
+        
+        const formData = new FormData(event.currentTarget);
+        const response = await updateProduct(formData);
+    
+        if (response.error === "validation") {
+                setState(response);
+                toast.error(response.message);
+            } 
+        else if (response.error==="productexists") {
+              toast.error(response.message);
+            } 
+        else {
+              toast.error(response.error);
+            }
+          
+      }
 
   const handleClick = e => {
     e.preventDefault();
@@ -44,7 +58,7 @@ export default function ProductEditForm({product, categories, images}) {
             New Product Form
           </h3>
         </div>
-        <form action={_updateProduct} >
+        <form onSubmit={onSubmit} >
         <input type="hidden" name="id" defaultValue={product._id.toString()}/>
         <input type="hidden" name="category_name" defaultValue={CategoryValue}/>
           <div className="p-6.5">
@@ -60,6 +74,7 @@ export default function ProductEditForm({product, categories, images}) {
                   placeholder="Enter product name"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
+                <ZodErrors error={state?.zodErrors?.product_name} />
               </div>
               <div className="w-full xl:w-1/2">
                 <label className="mb-3 block text-sm font-medium text-black dark:text-white">
@@ -72,6 +87,7 @@ export default function ProductEditForm({product, categories, images}) {
                   placeholder="Enter product code name"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 />
+                <ZodErrors error={state?.zodErrors?.slug} />
               </div>
             </div>
             <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -91,6 +107,7 @@ export default function ProductEditForm({product, categories, images}) {
                     </option>
                   ))}
                 </select>
+                <ZodErrors error={state?.zodErrors?.category_id} />
               </div>
               <div className="w-full xl:w-1/2">
                 <label className="mb-3 block text-sm font-medium text-black dark:text-white">
@@ -194,12 +211,6 @@ export default function ProductEditForm({product, categories, images}) {
             </div>
 
         <div className="mt-6 flex justify-end gap-4">
-              {/* <Link
-                href="/dashboard/products"
-                className="flex h-10 items-center rounded-lg bg-gray-400 px-4 text-sm font-medium text-gray-100 transition-colors hover:bg-gray-500"
-              >
-                Cancel
-              </Link> */}
               <CancelProductBtn/>
               <SaveProductBtn/>
             </div>

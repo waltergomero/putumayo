@@ -1,20 +1,34 @@
 "use client";
 
 import { updateCategory } from "@/actions/category-actions";
+import {  useState} from "react";
 import { SaveCategoryBtn, CancelCategoryBtn} from "@/components/categories/buttons";
-import Link from "next/link";
 import { toast } from 'react-toastify';
-import CheckboxDefault from "../Checkboxes/checkbox"
+import CheckboxDefault from "../Checkboxes/checkbox";
+import { ZodErrors } from "@/components/common/zodErrors";
 
 export default function CategoryEditForm({category, parentcategory}) {
-
-  const _updateCategory = async (formData) => {
-    const result = await updateCategory(formData);
-    if (result?.error) {
-      toast.error(result.error);
-    } 
-  };
-
+  const [state, setState] = useState(null);
+  
+  async function onSubmit(event) {
+         event.preventDefault();
+         setState(null);
+         
+         const formData = new FormData(event.currentTarget);
+         const response = await updateCategory(formData);
+     
+         if (response.error === "validation") {
+                 setState(response);
+                 toast.error(response.message);
+             } 
+         else if (response.error==="categoryexists") {
+               toast.error(response.message);
+             } 
+         else {
+               toast.error(response.error);
+             }
+           
+       }
 
 
   return (
@@ -24,7 +38,7 @@ export default function CategoryEditForm({category, parentcategory}) {
         Edit Category Form
       </h3>
     </div>
-    <form action={_updateCategory} >
+    <form onSubmit={onSubmit} >
     <input type="hidden" name="id" defaultValue={category._id.toString()}/>
       <div className="p-6.5">
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -36,9 +50,10 @@ export default function CategoryEditForm({category, parentcategory}) {
               type="text"
               name="category_name"
               defaultValue={category.category_name}
-              placeholder="Enter your first name"
+              placeholder="Enter category name"
               className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
+             <ZodErrors error={state?.zodErrors?.category_name} />
           </div>
 
           <div className="w-full xl:w-1/2">

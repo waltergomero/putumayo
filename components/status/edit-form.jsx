@@ -1,19 +1,34 @@
 "use client";
 
+import {  useState} from "react";
 import { updateStatus } from "@/actions/status-actions";
 import { SaveStatusBtn, CancelStatusBtn } from "@/components/status/buttons";
-import Link from "next/link";
 import { toast } from 'react-toastify';
-import CheckboxDefault from "../Checkboxes/checkbox"
+import CheckboxDefault from "../Checkboxes/checkbox";
+import { ZodErrors } from "@/components/common/zodErrors";
 
 export default function UserEditForm({status, statustypeid}) {
+  const [state, setState] = useState(null);
 
-const _updateStatus = async (formData) => {
-  const result = await updateStatus(formData);
-  if (result?.error) {
-    toast.error(result.error);
-  } 
-};
+  async function onSubmit(event) {
+         event.preventDefault();
+         setState(null);
+         
+         const formData = new FormData(event.currentTarget);
+         const response = await updateStatus(formData);
+     
+         if (response.error === "validation") {
+                 setState(response);
+                 toast.error(response.message);
+             } 
+         else if (response.error==="statusexists") {
+               toast.error(response.message);
+             } 
+         else {
+               toast.error(response.error);
+             }
+           
+       }
 
 
   return (
@@ -23,7 +38,7 @@ const _updateStatus = async (formData) => {
         Edit Status Form
       </h3>
     </div>
-    <form action={_updateStatus} >
+    <form onSubmit={onSubmit}>
     <input type="hidden" name="id" defaultValue={status._id.toString()}/>
       <div className="p-6.5">
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
@@ -35,9 +50,10 @@ const _updateStatus = async (formData) => {
               type="text"
               name="status_name"
               defaultValue={status.status_name}
-              placeholder="Enter your first name"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              placeholder="Enter status name"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
+             <ZodErrors error={state?.zodErrors?.status_name} />
           </div>
 
           <div className="w-full xl:w-1/2">
@@ -47,7 +63,7 @@ const _updateStatus = async (formData) => {
             <select
               name="status_type_id"
               defaultValue={status.status_type_id}
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 px-5 py-1 pl-10 text-md outline-2 placeholder:text-gray-500">
+              className="peer block w-full cursor-pointer rounded-md border border-gray-200 px-5 py-3 pl-4 text-md outline-2 placeholder:text-gray-500">
               <option value="" disabled>
               </option>
                   {statustypeid}
@@ -62,12 +78,6 @@ const _updateStatus = async (formData) => {
           </div>
         </div>
         <div className="mt-6 flex justify-end gap-4">
-          {/* <Link
-            href="/dashboard/status"
-            className="flex h-10 items-center rounded-lg bg-gray-400 px-4 text-sm font-medium text-gray-100 transition-colors hover:bg-gray-500"
-          >
-            Cancel
-          </Link> */}
           <CancelStatusBtn/>
           <SaveStatusBtn/>
         </div>

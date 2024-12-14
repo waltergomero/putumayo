@@ -1,5 +1,5 @@
 
-import { UpdateProductBtn, DeleteProductBtn } from '@/components/products/buttons';
+import { UpdateProductBtn, DeleteProductBtn, AddImageToProductBtn } from '@/components/products/buttons';
 import { fetchFilteredProducts } from '@/actions/product-actions';
 import { Fragment } from 'react';
 
@@ -87,6 +87,7 @@ export default async function StatusTable({ query, currentPage }) {
                   <div className="flex items-center space-x-3.5">
                     <UpdateProductBtn id={product._id.toString()}/>
                     <DeleteProductBtn id={product._id.toString()}/>
+                    <AddImageToProductBtn id={product._id.toString()}/>
                   </div>
                 </td>
               </tr>

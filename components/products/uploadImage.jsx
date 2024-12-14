@@ -102,7 +102,7 @@ const UploadImage = (productid) => {
                         <button className="absolute top-0 right-0 rounded-sm bg-rose-400" 
                          onClick={() => removeSelectedImage(image.name)}
                             >
-                            <TrashIcon className="w-5 h-5 text-white"/></button> 
+                            <TrashIcon className="w-6 h-6 text-white"/></button> 
                         </div>                                                                                                                                                          
                         ))}
                     </div>

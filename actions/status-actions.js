@@ -5,6 +5,7 @@ import connectDB from "@/config/database";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
+import { statusSchema } from "@/schemas/validationSchemas";
 
 const ITEM_PER_PAGE = 10;
 
@@ -85,11 +86,25 @@ export async function createStatus(formData) {
     const status_name = formData.get("status_name");
     const status_type_id = formData.get("status_type_id");
 
+    const validatedFields = statusSchema.safeParse({status_name,});
+    
+    console.log("validatedFields", validatedFields);
+    
+    if (!validatedFields.success) {
+          return {
+            error: "validation",
+            zodErrors: validatedFields.error.flatten().fieldErrors,
+            strapiErrors: null,
+            message: "Missing information on key fields.",
+          };
+        }
+
     await connectDB();
     const statusexists = await Status.findOne({ status_name: status_name, status_type_id: status_type_id });
 
     if (statusexists) {
-      return { error: `Status name ${status_name} with type id ${status_type_id}  already exists.` };
+      return {  error: "statusexists",
+        message: `Status name ${status_name} with type id ${status_type_id}  already exists.` };
     }
 
     const newStatus = new Status({
@@ -115,12 +130,26 @@ export async function updateStatus(formData) {
     const status_type_id = formData.get("status_type_id");
     const isactive = formData.get("isactive");
 
+    const validatedFields = statusSchema.safeParse({status_name,});
+    
+    console.log("validatedFields", validatedFields);
+    
+      if (!validatedFields.success) {
+          return {
+            error: "validation",
+            zodErrors: validatedFields.error.flatten().fieldErrors,
+            strapiErrors: null,
+            message: "Missing information on key fields.",
+          };
+        }
+
     await connectDB();
     const statusexists = await Status.findOne({ status_name: status_name, status_type_id: status_type_id });
 
     if (statusexists) {
       if (statusexists._id != id) {
-        return  {error: `Status name "${status_name}" with type id "${status_type_id}" already exists`};
+        return  {error: "statusexists",
+                 error: `Status name "${status_name}" with type id "${status_type_id}" already exists`};
       }
     }
 

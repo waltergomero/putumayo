@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import db from "@/utils/dbconnection";
+import connectDB from "@/config/database";
 import Images from "@/models/image";
 import fs from "node:fs/promises";
+
 
 
 export async function POST(req) {
@@ -26,7 +27,8 @@ export async function POST(req) {
     const imageName = newFileName.name;
 
     var sizeOf = require("image-size");
-    var dimensions = sizeOf(buffer);
+    var dimensions = sizeOf(Buffer.from(buffer));
+
  
     var format = "Landscape";
      if (dimensions.height > dimensions.width) format = "Portrait";
@@ -42,10 +44,9 @@ export async function POST(req) {
       format: format,
       order: order,
     });
-    db.connect();
+    await connectDB();
     const data = await addImage.save();
-    db.disconnect();
-
+  
     return NextResponse.json({ status: "success" });
   } catch (e) {
     console.error(e);

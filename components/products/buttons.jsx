@@ -2,11 +2,12 @@ import {
   PencilIcon,
   PlusIcon,
   TrashIcon,
-  XCircleIcon
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { deleteProduct, deleteImageFromProduct } from "@/actions/product-actions";
 import { Button } from "@/components/ui/button";
+
 
 export function CreateProductBtn() {
   return (
@@ -62,12 +63,13 @@ export function SaveProductBtn() {
   );
 }
 
-export function DeleteImageFromProductBtn({ id, image_path }) {
+export function DeleteImageFromProductBtn({id, image_path}) {
   const deleteProductImageId = deleteImageFromProduct.bind(null, id, image_path);
+ 
   return (
     <form action={deleteProductImageId}>
-      <button >
-        <TrashIcon className="w-4 text-rose-500" />
+      <button className="absolute top-0 right-0 rounded-sm bg-rose-400">
+        <TrashIcon className="w-5 h-5 text-white" />
       </button>
     </form>
   );
@@ -80,5 +82,15 @@ export function SaveImageBtn() {
       <span className="hidden md:block">Save Images</span>
       <PlusIcon className="h-6 md:ml-4" />
     </Button>
+  );
+}
+
+export function AddImageToProductBtn({ id }) {
+  const index = 1;
+  return (
+    <Link
+      href={`/admin/products/${id}/${index}/edit`}  >
+      <PencilIcon className="w-5 text-blue-500" />
+    </Link>
   );
 }

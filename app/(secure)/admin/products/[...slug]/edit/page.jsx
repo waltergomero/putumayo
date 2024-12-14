@@ -5,7 +5,10 @@ import {fetchCategories} from '@/actions/category-actions'
 import notFound from "./not-found";
 
 export default async function ProductEditPage({params}) {
-  const {id} = await params;
+
+  const {id, index} = await params;
+  console.log("id", id);
+  console.log("index", index);
   const [product] = await Promise.all([fetchProductById(id)]);
   const categories = await fetchCategories();
   const images = await fetchImageByProductId(id)

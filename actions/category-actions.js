@@ -5,6 +5,7 @@ import connectDB from "@/config/database";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
+import { categorySchema } from "@/schemas/validationSchemas";
 
 const ITEM_PER_PAGE = 10;
 
@@ -90,11 +91,24 @@ export async function createCategory(formData) {
     let parent_category_name = "";
     const notes = formData.get("notes");
 
+    const validatedFields = categorySchema.safeParse({category_name,});
+            
+    if (!validatedFields.success) {
+              return {
+                error: "validation",
+                zodErrors: validatedFields.error.flatten().fieldErrors,
+                strapiErrors: null,
+                message: "Missing information on key fields.",
+              };
+            }
+    
+
     await connectDB();
     const categoryexists = await Category.findOne({ category_name: category_name });
 
     if (categoryexists) {
-      return { error: `Category name ${category_name} already exists.` };
+      return { error: "categoryexists",
+        message: `Category name ${category_name} already exists.` };
     }
 
     if(parent_category_id != "") {
@@ -130,12 +144,24 @@ export async function updateCategory(formData) {
     const isactive = formData.get("isactive");
     const notes = formData.get("notes");
 
+    const validatedFields = categorySchema.safeParse({category_name,});
+            
+    if (!validatedFields.success) {
+              return {
+                error: "validation",
+                zodErrors: validatedFields.error.flatten().fieldErrors,
+                strapiErrors: null,
+                message: "Missing information on key fields.",
+              };
+            }
+
     await connectDB();
     const categoryexists = await Category.findOne({ category_name: category_name });
 
     if (categoryexists) {
       if (categoryexists._id != id) {
-        return  {error: `Category name "${category_name}"  already exists`};
+        return  {error: "categoryexists",
+                 message: `Category name "${category_name}"  already exists`};
       }
     }
 

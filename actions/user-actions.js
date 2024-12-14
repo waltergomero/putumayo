@@ -6,7 +6,7 @@ import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import connectDB from "@/config/database";
-import { userRegistrationSchema, userSigninSchema } from "@/schemas/validationSchemas";
+import { userRegistrationSchema, userSigninSchema, userUpdateSchema } from "@/schemas/validationSchemas";
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -62,7 +62,7 @@ export const fetchUserById = async (id) => {
 
 export async function createUser( formData, register=false) {
   const redirectPath = register ? "/auth/login" : "/admin/users";
-  console.log("formData", formData);
+
   try {
     const _isAdmin = formData.get("isadmin");
     const first_name = formData.get("first_name");
@@ -100,8 +100,9 @@ export async function createUser( formData, register=false) {
       return { 
         error: "userexists",
         message: `User with this email account ${email} already exists.`, 
-    }
-  }
+        }
+      }
+      
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
@@ -139,12 +140,30 @@ export async function updateUser(formData) {
     const isadmin = formData.get("isadmin");
     const isactive = formData.get("isactive");
 
+    const validatedFields = userUpdateSchema.safeParse({
+      first_name,
+      last_name,
+      email,
+    });
+
+    console.log("validatedFields", validatedFields);
+
+    if (!validatedFields.success) {
+      return {
+        error: "validation",
+        zodErrors: validatedFields.error.flatten().fieldErrors,
+        strapiErrors: null,
+        message: "Missing information on key fields.",
+      };
+    }
+
     await connectDB();
     const userexists = await User.findOne({ email: email });
 
     if (userexists) {
       if (userexists._id != id) {
-        return  {error: `User with this email "${email}" already exists`};
+        return  {error: "userexists",
+                 message: `User with this email "${email}" already exists`};
       }
     }
 

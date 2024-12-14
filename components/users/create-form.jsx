@@ -39,7 +39,7 @@ export default function UserCreateForm() {
         New User Form
       </h3>
     </div>
-    <form onSubmit={onSubmit} >
+    <form onSubmit={onSubmit}>
       <div className="p-6.5">
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
           <div className="w-full xl:w-1/2">
@@ -50,7 +50,7 @@ export default function UserCreateForm() {
               type="text"
               name="first_name"
               placeholder="Enter your first name"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
               <ZodErrors error={state?.zodErrors?.first_name} />
           </div>
@@ -63,7 +63,7 @@ export default function UserCreateForm() {
               type="text"
               name="last_name"
               placeholder="Enter your last name"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             />
              <ZodErrors error={state?.zodErrors?.last_name} />
           </div>
@@ -78,7 +78,8 @@ export default function UserCreateForm() {
             type="email"
             name="email"
             placeholder="Enter your email address"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            autocomplete="new-email"
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
            <ZodErrors error={state?.zodErrors?.email} />
         </div>
@@ -90,12 +91,14 @@ export default function UserCreateForm() {
           <input
             type="password"
             name="password"
+            autocomplete="new-password"
             placeholder="Enter password"
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
           />
           <ZodErrors error={state?.zodErrors?.password} />
         </div>
         </div>
+
         <div>
         <div className="mb-4.5 flex flex-col gap-6 xl:flex-row">
           <div className="w-full xl:w-1/2">
